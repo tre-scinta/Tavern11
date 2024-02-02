@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "name": "tavern11",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "modules/*"
+  ],
+  "version": "1.0.0",
+  "main": "index.js",
+  "devendencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
