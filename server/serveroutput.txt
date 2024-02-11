@@ -1,0 +1,5 @@
+
+> server@1.0.0 start
+> ts-node server.ts
+
+Server running on http://localhost:3000

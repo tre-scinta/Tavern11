@@ -2,6 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3000",
   "dependencies": {
     "@tavern11/shared-schemas": "1.0.0",
     "@tavern11/shared-validations": "1.0.0",

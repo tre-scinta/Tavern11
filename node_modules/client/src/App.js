@@ -9,7 +9,7 @@ const initialPlayers = [
 
 const App = () => {
   const [players, setPlayers] = useState(initialPlayers);
-  const [newPlayer, setNewPlayer] = useState({ playerName: '', phoneNumber: '', status: 'Attending' });
+  const [newPlayer, setNewPlayer] = useState({ id: '', playerName: '', phoneNumber: '', status: 'Attending' });
   const [editMode, setEditMode] = useState(null); // Store the ID of the player being edited
 
   const handleTextButtonClick = (playerName) => {
@@ -17,17 +17,37 @@ const App = () => {
     alert(`Sending a text to ${playerName}`);
   };
 
-  const handleAddPlayer = () => {
-    if (newPlayer.playerName && newPlayer.phoneNumber) {
-      setPlayers((prevPlayers) => [
-        ...prevPlayers,
-        { id: prevPlayers.length + 1, ...newPlayer },
-      ]);
-      setNewPlayer({ playerName: '', phoneNumber: '', status: 'Attending' });
-    }
-  };
+  const handleAddPlayer = async () => {
+    alert('Starting to handle add player');
 
-  const handleEditClick = (id) => {
+    if (newPlayer.playerName && newPlayer.phoneNumber) {
+      alert('Valid player data:', newPlayer);
+      try {
+        alert('Attempting to send player data to server');
+        const response = await fetch('/api/players', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newPlayer),
+        });
+        alert('Received response from server');
+
+        if (response.ok) {
+          alert('Player added successfully. Status:', response.status);
+          // Refresh player list from the server
+        } else {
+        }alert('Failed to add player');
+      } catch (error) {
+        alert('Error in fetching');
+      }
+      alert('Resetting new player data');
+      setNewPlayer({ playerName: '', phoneNumber: '', status: 'Attending' });
+    } else {
+      alert('Player data is invalid or incomplete:', newPlayer);
+    }
+};
+const handleEditClick = (id) => {
     setEditMode(id);
   };
 

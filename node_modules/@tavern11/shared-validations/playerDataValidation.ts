@@ -1,14 +1,17 @@
-import { PlayerDataSchema } from '../schemas/playerData'; 
-import { z } from 'zod';
+import { Request, Response, NextFunction } from 'express';
+import { PlayerDataSchema } from '../sharedSchemas/playerData';
+import { ZodError } from 'zod';
 
-export const validatePlayerData = (data: any) => {
+export function validatePlayerData(req: Request, res: Response, next: NextFunction): void {
   try {
-    const playerData = PlayerDataSchema.parse(data);
-    return { valid: true, data: playerData };
+    PlayerDataSchema.parse(req.body);
+    next();  
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return { valid: false, error: error.flatten() };
+    if (error instanceof ZodError) {
+      res.status(400).json({ error: error.errors });
+    } else {
+      // Handle unexpected errors differently
+      res.status(500).json({ error: 'An unexpected error occurred.' });
     }
-    return { valid: false, error: 'Unexpected error during validation' };
   }
-};
+}
