@@ -1,1 +1,44 @@
-[{"id":1,"playerName":"Ivy","phoneNumber":"123345678"}]
+[
+  {
+    "id": 1,
+    "playerName": "William",
+    "phoneNumber": "123345678",
+    "isAttending": false
+  },
+  {
+    "id": 2,
+    "playerName": "Tre",
+    "phoneNumber": "2223334444",
+    "isAttending": false
+  },
+  {
+    "id": 3,
+    "playerName": "Mia",
+    "phoneNumber": "3334445555",
+    "isAttending": false
+  },
+  {
+    "id": 4,
+    "playerName": "Ivy Roo",
+    "phoneNumber": "1234447890",
+    "isAttending": false
+  },
+  {
+    "id": 5,
+    "playerName": "Cindy",
+    "phoneNumber": "3212345544",
+    "isAttending": false
+  },
+  {
+    "id": 6,
+    "playerName": "Ivee",
+    "phoneNumber": "1233454433",
+    "isAttending": false
+  },
+  {
+    "id": 7,
+    "playerName": "harli",
+    "phoneNumber": "9998887777",
+    "isAttending": false
+  }
+]
