@@ -3,3 +3,5 @@
 > ts-node server.ts
 
 Server running on http://localhost:3000
+2024-02-11T23:33:47.247Z - GET request to /
+2024-02-11T23:44:51.058Z - GET request to /

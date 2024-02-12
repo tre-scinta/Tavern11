@@ -15,7 +15,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const dbPath = path.join(__dirname, 'players.json');
+const dbPath = path.join(__dirname, 'api', 'players.json');
 
 fs.ensureFileSync(dbPath);
 
@@ -28,7 +28,12 @@ function getNewId(data: PlayerData[]): number {
   return maxId + 1;
 }
 
-app.post('/api/players', validatePlayerData,  async (req: Request, res: Response) => {
+app.get("/", (req, res) => {
+  res.send("Welcome to the Players API!");
+}); 
+
+
+app.post("/api/players",  async (req: Request, res: Response) => {
   try {
     const data: PlayerData[] = await fs.readJson(dbPath, { throws: false }) || [];
     const newId = getNewId(data);
@@ -45,14 +50,10 @@ app.post('/api/players', validatePlayerData,  async (req: Request, res: Response
 
     res.status(201).json(newPlayer);
   } catch (error) {
-    if (error instanceof Error) {
-      console.error('Error processing request:', error.message);
-      console.error(error.stack);
-  } else {
-      // Handle the case where error is not an instance of Error
-      console.error('Error processing request:', error);
-  }
-  res.status(500).json({ error: 'Error adding player' });
+    console.error('Error processing request:', error instanceof Error ? error.message : error);
+    if (!res.headersSent) { // Checks if the response was not yet sent
+      res.status(500).json({ error: 'Error adding player' });
+    }
   }
 });
 

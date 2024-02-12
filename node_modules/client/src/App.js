@@ -16,38 +16,38 @@ const App = () => {
     // Add SMS logic here 
     alert(`Sending a text to ${playerName}`);
   };
-
-  const handleAddPlayer = async () => {
-    alert('Starting to handle add player');
-
+  
+  const handleAddPlayer = () => { 
     if (newPlayer.playerName && newPlayer.phoneNumber) {
-      alert('Valid player data:', newPlayer);
-      try {
-        alert('Attempting to send player data to server');
-        const response = await fetch('/api/players', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newPlayer),
-        });
-        alert('Received response from server');
-
-        if (response.ok) {
-          alert('Player added successfully. Status:', response.status);
-          // Refresh player list from the server
-        } else {
-        }alert('Failed to add player');
-      } catch (error) {
-        alert('Error in fetching');
-      }
-      alert('Resetting new player data');
-      setNewPlayer({ playerName: '', phoneNumber: '', status: 'Attending' });
+      fetch("/api/players", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',          
+        },
+        body: JSON.stringify(newPlayer),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        alert(`${data.playerName} added to database`); 
+      })
+      .then(() => {
+        setNewPlayer({ playerName: '', phoneNumber: '', status: 'Attending' });
+      })
+      .catch(error => {
+        console.error('There was an error!', error);
+        alert('There was an error!'); 
+      });
     } else {
-      alert('Player data is invalid or incomplete:', newPlayer);
+      console.error('Missing playerName or phoneNumber');
+      alert('Missing playerName or phoneNumber');
     }
-};
-const handleEditClick = (id) => {
+  };
+  const handleEditClick = (id) => {
     setEditMode(id);
   };
 
@@ -166,6 +166,5 @@ const handleEditClick = (id) => {
       </div>
     </div>
   );
-};
-
+  }
 export default App;
