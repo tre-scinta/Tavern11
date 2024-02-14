@@ -13,6 +13,18 @@ const App = () => {
 const [editPlayer, setEditPlayer] = useState(null);
 
 useEffect(() => {
+  const interval = setInterval(() => {
+    fetch(`/api/players`)
+      .then((response) => response.json())
+      .then((data) => {
+        setPlayers(data);
+      });
+  }, 3000); 
+
+  return () => clearInterval(interval); 
+}, []);
+
+useEffect(() => {
   fetch(`/api/players`)
     .then(response => {
       if (!response.ok) {

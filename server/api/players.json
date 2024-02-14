@@ -3,13 +3,13 @@
     "id": 2,
     "playerName": "Tre",
     "phoneNumber": "3259982767",
-    "isAttending": true
+    "isAttending": false
   },
   {
     "id": 3,
     "playerName": "Mia",
     "phoneNumber": "2109801539",
-    "isAttending": false
+    "isAttending": true
   },
   {
     "id": 4,

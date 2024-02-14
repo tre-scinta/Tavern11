@@ -1,3 +1,4 @@
+require('dotenv').config(); 
 import express, { Request, Response } from 'express';
 import * as fs from 'fs-extra';
 import path from 'path';
@@ -8,6 +9,7 @@ import { validatePlayerData } from '../modules/sharedValidations/playerDataValid
 const app = express();
 const PORT = 3000;
 const { MessagingResponse } = require('twilio').twiml;
+app.use(express.urlencoded({ extended: false }));
 
 app.use(express.json());
 
@@ -22,6 +24,9 @@ const sessionsPath = path.join(__dirname, 'api', 'sessions.json');
 
 
 // PASTE TWILIO CREDENTIALS HERE!!!
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN; 
+const twilioNumber = process.env.TWILIO_PHONE_NUMBER;
 
 // Twilio testing logic
 
@@ -30,14 +35,14 @@ const sessionsPath = path.join(__dirname, 'api', 'sessions.json');
 //   .create({
 //     body: 'You installed Twilio node, you magnificent beast!',
 //     to: '+13259982767', 
-//     from: '+18447227943', 
+//     from: twilioNumber, 
 //   })
 //   .then((message: any) => console.log(message.sid));
 
 
 // Sends player text when client clicks button 
 
-const client = require('twilio')(accountSid, authToken);
+const client = require('twilio')(accountSid, authToken, twilioNumber);
 
 app.post('/api/send-text', (req: Request, res: Response) => {
   const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
@@ -61,13 +66,50 @@ if (!playerName || !phoneNumber) {
 });
 
 // Sends reply when player confirms or declines via text
-app.post ('/sms', (req, res) => {
+app.post('/api/send-reply', (req: Request, res: Response) => {
+  const userText: string = req.body.Body;
+  const userNumber: string = req.body.From.replace(/^\+1/, '');
   const reply = new MessagingResponse();
 
-  reply.message('Thank you for your response.');
+  fs.readFile(dbPath, 'utf8', (err, data) => {
+    if (err) {
+      console.error("Error reading players file", err);
+      reply.message('Error processing your request.');
+      return res.type('text/xml').send(reply.toString());
+    }
 
-  res.type('text/xml').send(reply.toString());
-})
+    let players: { playerName: string; phoneNumber: string; isAttending?: boolean }[] = JSON.parse(data);
+    const playerIndex = players.findIndex(p => p.phoneNumber === userNumber);
+
+    if (playerIndex !== -1) {
+      if (userText === "1") {
+        players[playerIndex].isAttending = true;
+        reply.message('Thank you for confirming');
+      } else if (userText === "2") {
+        players[playerIndex].isAttending = false;
+        reply.message('Okay. Hope to see you next session!');
+      } else {
+        reply.message('Please respond with either 1 or 2. Responses must be a number');
+        return res.type('text/xml').send(reply.toString());
+      }
+
+      fs.writeFile(dbPath, JSON.stringify(players, null, 2), 'utf8', (writeErr) => {
+        if (writeErr) {
+          console.error("Error writing updated players file", writeErr);
+          reply.message('Error updating your attendance.');
+          return res.type('text/xml').send(reply.toString());
+        }
+
+        res.type('text/xml').send(reply.toString());
+      });
+    } else {
+      reply.message(`Your number is ${userNumber} and you said ${userText}. Is that correct?`);
+      res.type('text/xml').send(reply.toString());
+    }
+  });
+});
+
+
 fs.ensureFileSync(dbPath);
 
 function getNewId(data: PlayerData[]): number {
