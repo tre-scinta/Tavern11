@@ -13,7 +13,7 @@ const App = () => {
 const [editPlayer, setEditPlayer] = useState(null);
 
 useEffect(() => {
-  fetch('/api/players')
+  fetch(`/api/players`)
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -52,9 +52,30 @@ const handleStatusChange = (playerId, newStatus) => {
   });
 };
 
-const handleTextButtonClick = (playerName) => {
-    // Add SMS logic here 
-    alert(`Sending a text to ${playerName}`);
+const handleTextButtonClick = (playerName, id) => {
+
+  alert(`Initiating the send a text function call`);
+  
+  const playerToText = players.find(player => player.id === id);
+  alert(`Trying to send a text to ${playerName} with id: ${playerToText.id}`);    
+  if (playerToText) {
+      fetch(`/api/send-text`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(playerToText),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        alert(`Invited ${playerName} by text message`);
+      })
+      .catch(error => {
+        alert(`Error sending  a text to ${playerName} with id: ${playerToText.id}`);
+      });
+    }
   };
   
   const handleAddPlayer = () => { 
@@ -91,6 +112,32 @@ const handleTextButtonClick = (playerName) => {
   const handleEditClick = (player) => {
     setEditPlayer(player );
   };
+
+  const handleDeleteClick = (id) => {
+    // Confirm before deleting
+    if (!window.confirm('Are you sure you want to delete this player?')) {
+      return;
+    }
+  
+    fetch(`/api/players/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',          
+        },
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Failed to delete player with id ${id}. Status: ${response.status}`);
+        }
+        setPlayers(prevPlayers => prevPlayers.filter(player => player.id !== id));
+      })
+      .catch(error => {
+        console.error('Error deleting the player:', error);
+        alert(`An error occurred: ${error.message}`);
+      });
+    };
+      
+  
 
   const handleSaveClick = (id) => {
     const playerToUpdate = players.find(player => player.id === id);
@@ -197,12 +244,13 @@ const handleTextButtonClick = (playerName) => {
               <td>
                 {editPlayer && editPlayer.id  === player.id ? (
                   <>
+                    <button onClick={() => handleDeleteClick(player.id)}>Delete</button> {/* Add this line */}
                     <button onClick={() => handleSaveClick(player.id)}>Save</button>
                     <button onClick={handleCancelClick}>Cancel</button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => handleTextButtonClick(player.playerName)}>
+                    <button onClick={() => handleTextButtonClick(player.playerName, player.id)}>
                       Invite
                     </button>
                   </>
