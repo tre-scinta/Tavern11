@@ -28,6 +28,41 @@ useEffect(() => {
     });
 }, []);
 
+const [sessions, setSessions] = useState([]);
+const [recentSession, setRecentSession] = useState({});
+useEffect(() => {
+  fetch('/api/sessions')
+    .then(response => response.json())
+    .then(data => {
+      const lastSession = data[data.length - 1]; // Get the most recent session
+      setRecentSession(lastSession);
+    })
+    .catch(error => console.error('Error:', error));
+}, []);
+
+const [showSessionForm, setShowSessionForm] = useState(false);
+
+const setSessionDate = () => {
+  const month = document.getElementById("monthDropdown").value;
+  const day = document.getElementById("dayDropdown").value;
+  const year = document.getElementById("yearDropdown").value;
+
+  fetch('/api/sessions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      month: month,
+      day: day,
+      year: year,
+    }),
+  })
+  .then(response => response.json())
+  .then(data => console.log('Success:', data))
+  .catch((error) => console.error('Error:', error));
+};
+
 const handleStatusChange = (playerId, newStatus) => {
   setPlayers(players.map(player => {
     if (player.id === playerId) {
@@ -180,22 +215,55 @@ const handleTextButtonClick = (playerName, id) => {
   };
   
   return (
-    <div className="App">
-      <h1>Tavern11</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Edit</th>
-            <th>Name</th>
-            <th>Phone Number</th>
-            <th>Status</th>
-            <th>Send SMS Invite</th>
-          </tr>
-        </thead>
-        <tbody>
-          {players.map((player) => (
-            <tr key={player.id}>
-                    <td>
+  <div className="App">
+
+  <div id="title">
+    <h1>Tavern11</h1>
+  </div>
+  <div id="sessionDisplay">
+  <h2>Session Info</h2>
+  {Object.keys(recentSession).length > 0 ? (
+      <h4>Scheduled Session: {`${recentSession.month}/${recentSession.day}/${recentSession.year}`}</h4>
+    ) : (
+      <h4>Loading or no sessions available...</h4>
+    )}  <button id="addSessionBtn" onClick={() => setShowSessionForm(true)}>Add new session</button>
+    {showSessionForm&& (
+      <div id="sessionForm" >
+    <select id="monthDropdown">
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3">March</option>
+    </select>
+    <select id="dayDropdown">
+      <option value="1">1</option>
+      <option value="2">2</option>
+    </select>
+    <select id="yearDropdown">
+      <option value="2021">2021</option>
+      <option value="2022">2022</option>
+    </select>
+    <button onClick={() => setShowSessionForm(false)}>Cancel</button>
+    <button onClick={() => setSessionDate()}>Save Date</button>
+  </div>
+    )}
+    </div>
+
+  <div id="playerTable">
+    <h2>Current Players</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Edit</th>
+          <th>Name</th>
+          <th>Phone Number</th>
+          <th>Status</th>
+          <th>Send SMS Invite</th>
+        </tr>
+      </thead>
+      <tbody>
+        {players.map((player) => (
+          <tr key={player.id}>
+            <td>
         {editPlayer && editPlayer.id === player.id ? (
           <>
             <button onClick={() => handleSaveClick(player.id)}>Save</button>
@@ -260,8 +328,10 @@ const handleTextButtonClick = (playerName, id) => {
           ))}
         </tbody>
       </table>
+  </div>
+
+  <div id="addPlayer">
       <h2>Add New Player Here</h2>
-      <div>
         <label>Name:</label>
         <input
           type="text"
@@ -287,14 +357,12 @@ const handleTextButtonClick = (playerName, id) => {
         >
           <option value="Attending">Attending</option>
           <option value="Not Attending">Not Attending</option>
-          <option>Not Responded</option>
-          <option> Not Yet Invited </option>
         </select>
       </div>
       <div>
         <button onClick={handleAddPlayer}>Add Player</button>
-      </div>
-    </div>
+  </div>
+</div>
   );
   }
 export default App;

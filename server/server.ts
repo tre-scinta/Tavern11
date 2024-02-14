@@ -18,12 +18,12 @@ app.use((req, res, next) => {
 });
 
 const dbPath = path.join(__dirname, 'api', 'players.json');
+const sessionsPath = path.join(__dirname, 'api', 'sessions.json');
+
+
+// PASTE TWILIO CREDENTIALS HERE!!!
 
 // Twilio testing logic
-
-const accountSid = '';
-const authToken = '';
-const twilioNumber = '+18447227943';
 
 // const testClient = require('twilio')(accountSid, authToken);
 // testClient.messages
@@ -41,13 +41,14 @@ const client = require('twilio')(accountSid, authToken);
 
 app.post('/api/send-text', (req: Request, res: Response) => {
   const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-
+const sessionData = JSON.parse(fs.readFileSync(sessionsPath, 'utf8'));
   const { playerName, phoneNumber } = req.body;
-
-  if (!playerName || !phoneNumber) {
+const gameDate = sessionData[sessionData.length -1];
+  
+if (!playerName || !phoneNumber) {
     return res.status(400).send('Missing player name or phone number');
   }
-  const messageBody = `Hello, ${playerName}! This is a test message.`;
+  const messageBody = `Hello, ${playerName}! you're invited to a D&D session on ${gameDate.month}/${gameDate.day}/${gameDate.year} Please reply 1 to confirm or 2 to decline.`;
 
   client.messages
     .create({
@@ -189,8 +190,35 @@ app.delete('/api/players/:id', (req, res) => {
 
   res.send({ success: true });
 });
+app.post('/api/sessions', (req, res) => {
+const sessionData = req.body;
 
+fs.readFile(sessionsPath, (err, data) => {
+  if (err && err.code === 'ENOENT') {
+    fs.writeFile(sessionsPath, JSON.stringify([sessionData]), () => {
+      res.status(201).send('Session saved');
+    });
+  } else {
+    const sessions = JSON.parse(data.toString());
+    sessions.push(sessionData);
+    fs.writeFile(sessionsPath, JSON.stringify(sessions), () => {
+      res.status(201).send('Session saved');
+    });
+  }
+});
+});
 
+app.get('/api/sessions', (req: Request, res: Response) => {
+  
+  fs.readFile(sessionsPath, (err, data) => {
+    if (err) {
+      console.error('Error reading sessions.json:', err);
+      res.status(500).send('Error loading session data');
+      return;
+    }
+    res.json(JSON.parse(data.toString()));
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
