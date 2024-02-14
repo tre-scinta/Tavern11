@@ -1,2 +1,8 @@
+# files I used for accessing terminal output during development
 *.txt
+# Node modules
 node_modules/
+
+# dotenv files
+.env
+.env.test
