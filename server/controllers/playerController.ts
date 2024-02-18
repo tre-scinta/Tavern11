@@ -189,5 +189,5 @@ const { id } = req.params; // Get the id from URL params
     fs.writeFileSync(dbPath, JSON.stringify(updatedPlayers, null, 2));
   
     res.send({ success: true });
-  });
+  };
   
