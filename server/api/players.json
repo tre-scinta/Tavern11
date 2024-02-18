@@ -1,26 +1,8 @@
 [
   {
-    "id": 2,
+    "id": 1,
     "playerName": "Tre",
     "phoneNumber": "3259982767",
-    "isAttending": false
-  },
-  {
-    "id": 3,
-    "playerName": "Mia",
-    "phoneNumber": "2109801539",
-    "isAttending": true
-  },
-  {
-    "id": 4,
-    "playerName": "Ivy",
-    "phoneNumber": "1234447890",
-    "isAttending": false
-  },
-  {
-    "id": 7,
-    "playerName": "harli",
-    "phoneNumber": "9998887777",
     "isAttending": false
   }
 ]
