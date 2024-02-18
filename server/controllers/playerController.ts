@@ -1,13 +1,22 @@
+require('dotenv').config(); 
+
 import { Request, Response } from 'express';
 import fs from 'fs-extra';
 import path from 'path';
 import { PlayerData } from '../../modules/sharedSchemas/playerData';
 import twilio from 'twilio';
-import { MessagingResponse } from 'twilio/lib/twiml/MessagingResponse';
-import { client, twilioNumber } from './twilioClient';
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioNumber = process.env.TWILIO_PHONE_NUMBER;
+
+const client = twilio(accountSid, authToken);
+const { MessagingResponse } = require('twilio').twiml;
+
 
 const dbPath = path.join(__dirname, '..', 'api', 'players.json');
 const sessionsPath = path.join(__dirname, '..', 'api', 'sessions.json');
+
 
 fs.ensureFileSync(dbPath);
 

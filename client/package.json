@@ -16,8 +16,9 @@
     "webpack": "^5.90.1",
     "webpack-dev-server": "^4.15.1"
   },
+  "homepage": "https://tavern11.ngrok.io",
   "scripts": {
-    "start": "cross-env PORT=3001 react-scripts start",
+    "start": "cross-env DANGEROUSLY_DISABLE_HOST_CHECK=true PORT=3001 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
